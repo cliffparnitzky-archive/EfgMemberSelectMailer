@@ -262,9 +262,17 @@ class tl_efgmemberselectmailer extends Backend
 	 */
 	public function getFormFields($formId, $arrTypes)
 	{
-		$form = $this->Database->prepare("SELECT title from tl_form WHERE id = ?")
+		$obForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id = ?")
 										->execute($formId);
-		$this->loadDataContainer('fd_' . str_replace('-', '_', standardize($form->title)));
+
+		$dca = 'fd_' . str_replace('-', '_', standardize($obForm->title));
+							
+		if (strlen($obForm->formID)) {
+			$dca = 'fd_' . $obForm->formID;
+		}
+		
+		$this->loadDataContainer($dca);
+		
 		$arrReturn = array();
 		
 		if (count($GLOBALS['TL_DCA']['tl_formdata']['fields']) > 0)
