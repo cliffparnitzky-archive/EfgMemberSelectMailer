@@ -24,3 +24,9 @@ Compatibility
 
 - min. version: Contao 2.9.5
 - max. version: Contao 2.10.4
+
+
+Dependency
+----------
+
+- This extension is dependent on the following extensions: [[efg]](http://contao.org/de/extension-list/view/efg.de.html), [[EfgMemberSelect]](http://contao.org/de/extension-list/view/EfgMemberSelect.de.html), [[ExtendedEmailRegex]](http://contao.org/de/extension-list/view/ExtendedEmailRegex.de.html)
