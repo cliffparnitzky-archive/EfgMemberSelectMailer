@@ -123,7 +123,11 @@ class EfgMemberSelectMailer extends Frontend {
 						case 'name': $textArray[$count] = $arrForm['efgMemberSelectMailerMailSenderName']; break;
 				} 
 			} else if ($parts[0] == "post") {
-				$textArray[$count] = $post[$parts[1]];
+				if (is_array($post[$parts[1]])) {
+					$textArray[$count] = implode(", ", $post[$parts[1]]);
+				} else {
+					$textArray[$count] = $post[$parts[1]];
+				}
 			} else if ($parts[0] == "user") {
 				if (FE_USER_LOGGED_IN) {
 					$this->import('FrontendUser', 'User');
