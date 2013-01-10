@@ -31,12 +31,10 @@ class EfgMemberSelectMailer extends Frontend {
 	/**
 	 * Check if mails should be send and execute it.
 	 */
-	public function processEfgFormData($arrSubmitted, $arrFiles, $intOldId, $arrForm) {
-		$config = $this->Database->prepare("SELECT DISTINCT * FROM tl_efgmemberselectmailer WHERE form = ?")
-												 ->execute(intval($arrForm[id]));
-		if ($config->numRows) {
-			if (!$config->form_use_send_mail_check || (strlen($config->form_field_send_mail) > 0 && $arrSubmitted[$config->form_field_send_mail] == $config->form_value_send_mail)) {
-				$memberIds = $arrSubmitted[$config->form_field_member];
+	public function processEfgFormData($arrSubmitted, $arrFiles, $intOldId, $arrForm, $arrLabels=null) {
+		if ($arrForm['efgMemberSelectMailerActive']) {
+			if (!$arrForm['efgMemberSelectMailerConfirmSendMailActive'] || (strlen($arrForm['efgMemberSelectMailerConfirmSendMailFormField']) > 0 && $arrSubmitted[$arrForm['efgMemberSelectMailerConfirmSendMailFormField']] == $arrForm['efgMemberSelectMailerConfirmSendMailValue'])) {
+				$memberIds = $arrSubmitted[$arrForm['efgMemberSelectMailerMemberFormField']];
 				if (is_array($memberIds)) {
 					$memberIds = implode(", ", $memberIds);
 				};
@@ -45,7 +43,7 @@ class EfgMemberSelectMailer extends Frontend {
 					$member = $this->Database->prepare("SELECT * FROM tl_member WHERE id IN (" . $memberIds . ")")
 												 ->execute();
 					while ($member->next()) {
-						$this->sendMail($member, $arrForm, $config, $arrSubmitted);
+						$this->sendMail($member, $arrForm, $arrSubmitted);
 					}
 				}
 			}
@@ -57,7 +55,7 @@ class EfgMemberSelectMailer extends Frontend {
 	/**
 	 * Sending the email
 	 */
-	private function sendMail($member, $form, $config, $post) {
+	private function sendMail($member, $arrForm, $post) {
 		// first check if required extension 'ExtendedEmailRegex' is installed
 		if (!in_array('extendedEmailRegex', $this->Config->getActiveModules())) {
 			$this->log('EfgMemberSelectMailer: Extension "ExtendedEmailRegex" is required!', 'EfgMemberSelectMailer sendMail()', TL_ERROR);
@@ -67,22 +65,13 @@ class EfgMemberSelectMailer extends Frontend {
 		
 		$objEmail = new Email();
 		$objEmail->logFile = 'EfgMemberSelectMailer.log';
-		$objEmail->from = $config->sender;
-		if (strlen($config->senderName) > 0) {
-			$objEmail->fromName = $config->senderName;
+		$objEmail->from = $arrForm['efgMemberSelectMailerMailSenderEmail'];
+		if (strlen($arrForm['efgMemberSelectMailerMailSenderName']) > 0) {
+			$objEmail->fromName = $arrForm['efgMemberSelectMailerMailSenderName'];
 		}
-		
-		$objEmail->subject = $this->replaceEmailInsertTags($config->mailSubject, $member, $form, $config, $post);
-		
-		if ($config->mailTextType == 'text') {
-			$objEmail->text = $this->replaceEmailInsertTags($config->mailPlainText, $member, $form, $config, $post);
-		} else if ($config->mailTextType == 'html') {
-			$objEmail->html = $this->replaceEmailInsertTags($config->mailHtmlText, $member, $form, $config, $post);
-			$objEmail->text = $this->transformEmailHtmlToText($objEmail->html);
-		} else {
-			$objEmail->text = $this->replaceEmailInsertTags($config->mailPlainText, $member, $form, $config, $post);
-			$objEmail->html = $this->replaceEmailInsertTags($config->mailHtmlText, $member, $form, $config, $post);
-		}
+		$objEmail->subject = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailSubject'], $member, $arrForm, $post);
+		$objEmail->html = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailText'], $member, $arrForm, $post);
+		$objEmail->text = $this->transformEmailHtmlToText($objEmail->html);
 		
 		try {
 			$emailTo = $member->email;
@@ -90,13 +79,13 @@ class EfgMemberSelectMailer extends Frontend {
 			if ($GLOBALS['TL_CONFIG']['efgMemberSelectMailerDeveloperMode']) {
 				$emailTo = $GLOBALS['TL_CONFIG']['efgMemberSelectMailerDeveloperModeEmail'];
 			} else {
-				if (strlen($config->mailCopy) > 0) {
-					$emailCC = ExtendedEmailRegex::getEmailsFromList($config->mailCopy);
+				if (strlen($arrForm['efgMemberSelectMailerMailCopy']) > 0) {
+					$emailCC = ExtendedEmailRegex::getEmailsFromList($arrForm['efgMemberSelectMailerMailCopy']);
 					$objEmail->sendCc($emailCC);
 				}
 				
-				if (strlen($config->mailBlindCopy) > 0) {
-					$emailBCC = ExtendedEmailRegex::getEmailsFromList($config->mailBlindCopy);
+				if (strlen($arrForm['efgMemberSelectMailerMailBlindCopy']) > 0) {
+					$emailBCC = ExtendedEmailRegex::getEmailsFromList($arrForm['efgMemberSelectMailerMailBlindCopy']);
 					$objEmail->sendBcc($emailBCC);
 				}
 				
@@ -111,7 +100,7 @@ class EfgMemberSelectMailer extends Frontend {
 	/**
 	 * Replaces all insert tags for the email text.
 	 */
-	private function replaceEmailInsertTags ($text, $member, $form, $config, $post) {
+	private function replaceEmailInsertTags ($text, $member, $arrForm, $post) {
 		$textArray = preg_split('/\{\{([^\}]+)\}\}/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 		
 		for ($count = 0; $count < count($textArray); $count++) {
@@ -128,12 +117,10 @@ class EfgMemberSelectMailer extends Frontend {
 				} else {
 					$textArray[$count] = $member->$parts[1];
 				}
-			} else if ($parts[0] == "form") {
-				$textArray[$count] = $form[$parts[1]];
 			} else if ($parts[0] == "sender") {
 				switch ($parts[1]) {
-						case 'email': $textArray[$count] = $config->sender; break;
-						case 'name': $textArray[$count] = $config->senderName; break;
+						case 'email': $textArray[$count] = $arrForm['efgMemberSelectMailerMailSenderEmail']; break;
+						case 'name': $textArray[$count] = $arrForm['efgMemberSelectMailerMailSenderName']; break;
 				} 
 			} else if ($parts[0] == "post") {
 				$textArray[$count] = $post[$parts[1]];

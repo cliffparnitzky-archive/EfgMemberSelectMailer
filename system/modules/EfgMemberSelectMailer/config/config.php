@@ -29,19 +29,6 @@
 
 /**
  * -------------------------------------------------------------------------
- * BACK END MODULES
- * -------------------------------------------------------------------------
- */
-
-// Add configuration to Backend -> Accounts
-$GLOBALS['BE_MOD']['EfgMemberSelectAdditionals']['EfgMemberSelectMailer'] = array
-(
-	'tables'	=> array('tl_efgmemberselectmailer'),
-	'icon'		=> 'system/modules/EfgMemberSelectMailer/html/icon.png'
-);
-
-/**
- * -------------------------------------------------------------------------
  * HOOKS
  * -------------------------------------------------------------------------
  */

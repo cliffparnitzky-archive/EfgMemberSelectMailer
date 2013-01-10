@@ -30,7 +30,6 @@
 /**
  * Define name and tooltip for preferences (inactive modules)
  */
-$GLOBALS['TL_LANG']['MOD']['EfgMemberSelectAdditionals'] = 'Member Select-Menu';
-$GLOBALS['TL_LANG']['MOD']['EfgMemberSelectMailer'] = array('Mailer', 'Sends e-mails, if a member was choosen in a member select-menu of a form.');
+$GLOBALS['TL_LANG']['MOD']['EfgMemberSelectMailer'] = array('Member Select-Menu Mailer', 'Sends e-mails, if a member was choosen in a member select-menu of a form.');
 
 ?>
