@@ -56,5 +56,6 @@ $GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailer']['help']['inserttags']['m
 $GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailer']['help']['inserttags']['sender']   = array('<i>{{sender::*}}</i>', 'This tag returns the settings of the sender (replace * with one of the following attributes of the sender: <i>email</i>, <i>name</i>).'); 
 $GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailer']['help']['inserttags']['post']     = array('<i>{{post::*}}</i>', 'This tag returns all submitted field values of the form (replace * with any field name of the form).'); 
 $GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailer']['help']['inserttags']['user']     = array('<i>{{user::*}}</i>', 'This tag returns all field values of the actually logged frontend user (replace * with any field name of the user).'); 
+$GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailer']['help']['inserttags']['ifnew']    = array('<i>{{ifnew::*}}</i>', 'This tag returns a special text, when the submitted form entry is new (initial creation of a new entry).</br></br>Example: <i>{{ifnew}}my special text{{endif}}</i></br></br>Using <i>{{else}}</i> offers the possibility to add an alternative text, if the form entry was edited.</br></br>Example: <i>{{ifnew}}creation info{{else}}edit info{{endif}}</i>'); 
 
 ?>
