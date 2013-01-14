@@ -43,7 +43,7 @@ class EfgMemberSelectMailer extends Frontend {
 					$member = $this->Database->prepare("SELECT * FROM tl_member WHERE id IN (" . $memberIds . ")")
 												 ->execute();
 					while ($member->next()) {
-						$this->sendMail($member, $arrForm, $arrSubmitted);
+						$this->sendMail($member, $arrForm, $arrSubmitted, $intOldId == 0);
 					}
 				}
 			}
@@ -55,7 +55,7 @@ class EfgMemberSelectMailer extends Frontend {
 	/**
 	 * Sending the email
 	 */
-	private function sendMail($member, $arrForm, $post) {
+	private function sendMail($member, $arrForm, $post, $isNew) {
 		// first check if required extension 'ExtendedEmailRegex' is installed
 		if (!in_array('extendedEmailRegex', $this->Config->getActiveModules())) {
 			$this->log('EfgMemberSelectMailer: Extension "ExtendedEmailRegex" is required!', 'EfgMemberSelectMailer sendMail()', TL_ERROR);
@@ -69,8 +69,8 @@ class EfgMemberSelectMailer extends Frontend {
 		if (strlen($arrForm['efgMemberSelectMailerMailSenderName']) > 0) {
 			$objEmail->fromName = $arrForm['efgMemberSelectMailerMailSenderName'];
 		}
-		$objEmail->subject = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailSubject'], $member, $arrForm, $post);
-		$objEmail->html = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailText'], $member, $arrForm, $post);
+		$objEmail->subject = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailSubject'], $member, $arrForm, $post, $isNew);
+		$objEmail->html = $this->replaceEmailInsertTags($arrForm['efgMemberSelectMailerMailText'], $member, $arrForm, $post, $isNew);
 		$objEmail->text = $this->transformEmailHtmlToText($objEmail->html);
 		
 		try {
@@ -100,7 +100,7 @@ class EfgMemberSelectMailer extends Frontend {
 	/**
 	 * Replaces all insert tags for the email text.
 	 */
-	private function replaceEmailInsertTags ($text, $member, $arrForm, $post) {
+	private function replaceEmailInsertTags ($text, $member, $arrForm, $post, $isNew) {
 		$textArray = preg_split('/\{\{([^\}]+)\}\}/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 		
 		for ($count = 0; $count < count($textArray); $count++) {
@@ -143,6 +143,33 @@ class EfgMemberSelectMailer extends Frontend {
 						$textArray[$count] = $this->User->$parts[1];
 					}
 				} 
+			} else if ($parts[0] == "ifnew") {
+				if (count($textArray) > $count + 2) {
+					$partsNext = explode("::", $textArray[$count + 2]);
+					if ($textArray[$count + 2] == "endif") {
+						// we have {{ifnew}}text{{endif}}
+						if ($isNew) {
+							$textArray[$count] = $textArray[$count + 1];
+						} else {
+							$textArray[$count] = "";
+						}
+						$textArray[$count + 1] = "";
+						$textArray[$count + 2] = "";
+						$count = $count + 2;
+					} else if ($textArray[$count + 2] == "else" && $textArray[$count + 4] == "endif") {
+						// we have {{ifnew}}text{{else}}other text{{endif}}
+						if ($isNew) {
+							$textArray[$count] = $textArray[$count + 1];
+						} else {
+							$textArray[$count] = $textArray[$count + 3];
+						}
+						$textArray[$count + 1] = "";
+						$textArray[$count + 2] = "";
+						$textArray[$count + 3] = "";
+						$textArray[$count + 4] = "";
+						$count = $count + 4;
+					}
+				}
 			}
 		}
 		
