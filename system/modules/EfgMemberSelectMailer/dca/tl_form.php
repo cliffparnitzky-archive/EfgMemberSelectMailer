@@ -134,7 +134,7 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
  *
  * Provide miscellaneous methods that are used by the data configuration array.
  * PHP version 5
- * @copyright  Cliff Parnitzky 2012
+ * @copyright  Cliff Parnitzky 2012-2013
  * @author     Cliff Parnitzky
  * @package    Controller
  */
@@ -143,7 +143,7 @@ class tl_form_efgmemberselectmailer extends Backend {
 	 * Returns the member fields of the actual form
 	 */
 	public function getFormMemberFields(DataContainer $dc) {
-		return $this->getFormFields($dc->activeRecord->id, array('efgMemberSelect', 'hidden'));
+		return $this->getFormFields($dc->activeRecord->id, array('efgMemberSelect', 'efgMemberHidden'));
 	}
 	
 	/**
