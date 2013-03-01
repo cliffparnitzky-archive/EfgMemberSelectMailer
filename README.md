@@ -1,5 +1,5 @@
-Contao EfgMemberSelectMailer Extension
-======================================
+Contao Extension: EfgMemberSelectMailer
+=======================================
 
 Sends e-mails, if a member was choosen in a member select-menu of a form.
 
@@ -23,7 +23,7 @@ Compatibility
 -------------
 
 - min. version: Contao 2.9.5
-- max. version: Contao 2.11.8
+- max. version: Contao 2.11.x
 
 
 Dependency
