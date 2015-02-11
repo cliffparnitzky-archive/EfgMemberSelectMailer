@@ -89,14 +89,14 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['efgMemberSelectMailerMailCopy'] = array
 	'label'                 => &$GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailerMailCopy'],
 	'exclude'               => true,
 	'inputType'             => 'text',
-	'eval'                  => array('rgxp' => 'emailList','maxlength'=>255, 'tl_class'=>'w50 clr')
+	'eval'                  => array('rgxp' => 'emails','maxlength'=>255, 'tl_class'=>'w50 clr')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['efgMemberSelectMailerMailBlindCopy'] = array
 (
 	'label'                 => &$GLOBALS['TL_LANG']['tl_form']['efgMemberSelectMailerMailBlindCopy'],
 	'exclude'               => true,
 	'inputType'             => 'text',
-	'eval'                  => array('rgxp' => 'emailList','maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                  => array('rgxp' => 'emails','maxlength'=>255, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['efgMemberSelectMailerMailSubject'] = array
 (
